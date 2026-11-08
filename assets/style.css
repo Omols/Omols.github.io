@@ -151,13 +151,6 @@ body{
 .dock-items a:hover::after,.dock-items a.active::after{transform:scaleX(1)}
 .dock-items a.active{background:rgba(255,255,255,.26)}
 
-/* 小屏：花固定在左上，标签常显 */
-@media (max-width:760px){
-  .dock-flower{left:22px;top:14px;transform:none}
-  .dock-items{left:88px;top:22px;transform:none;gap:4px;flex-direction:row !important}
-  .dock-items li{opacity:1 !important;transform:none !important;pointer-events:auto !important}
-  .dock-items a{padding:7px 13px;font-size:13px;letter-spacing:.08em}
-}
 
 /* ================= 首屏 ================= */
 .hero{
@@ -341,4 +334,76 @@ footer{
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+
+/* ================= 移动端适配 ================= */
+@media (max-width: 760px){
+  /* 导航：花钉在左上，点一下展开竖排标签 */
+  .dock{height:auto}
+  .dock-flower{left:16px;top:12px;transform:none}
+  .dock-flower .bell{width:30px;height:30px}
+  .halo{width:54px;height:54px}
+
+  .dock-items{
+    left:16px;top:74px;transform:none;
+    flex-direction:column;align-items:flex-start;gap:6px;
+  }
+  .dock-items li{
+    opacity:0;transform:translateY(-10px);pointer-events:none;
+    transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1);
+  }
+  .dock.open .dock-items li{opacity:1;transform:none;pointer-events:auto}
+  .dock.open .dock-items li:nth-child(1){transition-delay:.06s}
+  .dock.open .dock-items li:nth-child(2){transition-delay:.12s}
+  .dock.open .dock-items li:nth-child(3){transition-delay:.18s}
+  .dock-items a{padding:7px 15px;font-size:13.5px;letter-spacing:.06em}
+
+  /* 关掉整页毛玻璃：移动端滚动会闪，改成半透明底色 */
+  .veil{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    background:linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.24) 45%, rgba(255,255,255,.16) 100%);
+  }
+
+  /* 卡片同样不用 backdrop-filter，改用更实的白 */
+  .glass,.card{
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    background:rgba(255,255,255,.32);
+    box-shadow:0 10px 30px rgba(45,32,80,.18);
+  }
+
+  /* 背景层：去掉 will-change，避免合成层闪烁 */
+  .layer{will-change:auto}
+  .cursor-glow{display:none}
+
+  /* 文字与间距 */
+  .hero{padding:16vh 6vw 10vh}
+  .hero-inner{width:100%;max-width:100%;margin-left:0 !important;justify-self:center;text-align:center}
+  .title{font-size:clamp(64px,20vw,110px);gap:.04em;justify-content:center}
+  .subtitle{font-size:15px}
+  .hero-actions{gap:10px;margin-top:30px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:11px 20px;font-size:14px;flex:0 0 auto}
+  .hint{margin-top:38px;font-size:12px}
+
+  main{padding:0 7vw 4vh}
+  .section{padding:8vh 0 2vh}
+  h2{font-size:24px;gap:10px;margin-bottom:18px}
+  .bell-icon{width:32px;height:32px;font-size:14px}
+  .glass{padding:24px 20px}
+  .lead{font-size:15.5px}
+  .facts li{padding:11px 14px;flex-wrap:wrap;gap:10px}
+  .facts span{font-size:14.5px}
+  .cards{gap:16px}
+  .card{padding:22px 20px 20px}
+  .card h3{font-size:19px}
+  .links a{padding:9px 20px;font-size:14px}
+  footer{padding:30px 7vw 40px;font-size:12px}
+}
+
+/* 更小的手机 */
+@media (max-width: 380px){
+  .title{font-size:clamp(54px,22vw,88px)}
+  .facts li{display:block}
+  .facts b{display:inline-block;margin-bottom:4px}
 }

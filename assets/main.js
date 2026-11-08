@@ -104,7 +104,7 @@
 /* ---------------- 背景视差 ---------------- */
 (function parallax(){
   const layers = [...document.querySelectorAll('.layer[data-depth]')];
-  if (!layers.length) return;
+  if (!layers.length || window.innerWidth <= 760) return;
   let mx = 0, my = 0, tx = 0, ty = 0;
   window.addEventListener('pointermove', e => {
     tx = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -154,6 +154,7 @@
 
 /* ---------------- 卡片 3D 跟随 ---------------- */
 (function tilt(){
+  if (window.innerWidth <= 760) return;
   document.querySelectorAll('.tilt').forEach(card => {
     card.addEventListener('pointermove', e => {
       const r = card.getBoundingClientRect();
@@ -216,6 +217,18 @@
   });
 })();
 
+/* ---------------- 诊断（#mdiag） ---------------- */
+if (location.hash === '#mdiag') {
+  setTimeout(() => {
+    const de = document.documentElement;
+    const wide = [...document.querySelectorAll('body *')]
+      .filter(el => el.getBoundingClientRect().right > de.clientWidth + 2)
+      .slice(0, 4)
+      .map(el => el.tagName + '.' + (el.className || '') + '@' + Math.round(el.getBoundingClientRect().right));
+    document.title = 'cw=' + de.clientWidth + '|sw=' + de.scrollWidth + '|' + wide.join(' | ');
+  }, 1200);
+}
+
 /* ---------------- 年份 ---------------- */
 const y = document.getElementById('year');
 if (y) y.textContent = new Date().getFullYear();
@@ -232,7 +245,16 @@ if (y) y.textContent = new Date().getFullYear();
 
   let p = 0, target = 0, raf = null, hoverOpen = false, closeTimer = null;
 
+  const isMobile = () => window.innerWidth <= 760;
+
   function render(){
+    // 移动端：不做滚动位移/旋转，标签交给 .open 控制，避免花飞出屏幕
+    if (isMobile()) {
+      flower.style.transform = '';
+      items.forEach(li => { li.style.opacity = ''; li.style.transform = ''; li.style.pointerEvents = ''; });
+      dock.classList.remove('docked');
+      return;
+    }
     const hoverMode = p < 0.02 && hoverOpen;
     // 缓动：一开始就跑得快一点，避免“滚了半天花没动”
     const e = Math.pow(p, 0.72);
@@ -295,6 +317,11 @@ if (y) y.textContent = new Date().getFullYear();
   flower.addEventListener('mouseenter', openHover);
   flower.addEventListener('click', e => {
     e.preventDefault();
+    if (isMobile()) {
+      const open = dock.classList.toggle('open');
+      flower.setAttribute('aria-expanded', open ? 'true' : 'false');
+      return;
+    }
     if (target > 0.02) return;
     hoverOpen ? closeHover() : openHover();
   });
@@ -345,6 +372,18 @@ if (y) y.textContent = new Date().getFullYear();
     }, 1800);
   }
 })();
+
+/* ---------------- 诊断（#mdiag） ---------------- */
+if (location.hash === '#mdiag') {
+  setTimeout(() => {
+    const de = document.documentElement;
+    const wide = [...document.querySelectorAll('body *')]
+      .filter(el => el.getBoundingClientRect().right > de.clientWidth + 2)
+      .slice(0, 4)
+      .map(el => el.tagName + '.' + (el.className || '') + '@' + Math.round(el.getBoundingClientRect().right));
+    document.title = 'cw=' + de.clientWidth + '|sw=' + de.scrollWidth + '|' + wide.join(' | ');
+  }, 1200);
+}
 
 /* ---------------- 年份 ---------------- */
 const yEl = document.getElementById('year');
