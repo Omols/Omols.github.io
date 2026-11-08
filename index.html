@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>月见 · 个人主页</title>
+<meta name="description" content="个人主页：视觉小说、语音模型，以及一些在路上的东西。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='24'>🌙</text></svg>">
+<link rel="stylesheet" href="assets/style.css?v=5">
+</head>
+<body>
+
+<!-- ============ 背景：二次元风景（分景深） ============ -->
+<div class="scene" id="scene" aria-hidden="true">
+  <div class="layer sky"></div>
+  <div class="layer sun"></div>
+  <div class="layer clouds" data-depth="4">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+        <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#2b2f6e"/>
+          <stop offset="38%" stop-color="#7b6fb5"/>
+          <stop offset="62%" stop-color="#f3a6a0"/>
+          <stop offset="82%" stop-color="#ffd6ad"/>
+        </linearGradient>
+      </defs>
+      <rect width="1600" height="900" fill="url(#sunset)"/>
+      <g filter="url(#soft)" opacity=".55" fill="#ffffff">
+        <ellipse cx="320" cy="250" rx="210" ry="52"/>
+        <ellipse cx="520" cy="300" rx="160" ry="38"/>
+        <ellipse cx="1180" cy="200" rx="240" ry="56"/>
+        <ellipse cx="1420" cy="300" rx="170" ry="40"/>
+        <ellipse cx="800" cy="150" rx="200" ry="42"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="layer mountains far" data-depth="10">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+      <path d="M0 620 L180 520 L320 590 L470 470 L640 600 L780 520 L960 610 L1120 500 L1300 600 L1460 530 L1600 610 L1600 900 L0 900 Z"
+            fill="#5a5680" opacity=".55"/>
+    </svg>
+  </div>
+
+  <div class="layer mountains mid" data-depth="18">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+      <path d="M0 700 L150 620 L300 690 L460 590 L620 700 L800 610 L980 710 L1160 620 L1340 700 L1500 630 L1600 700 L1600 900 L0 900 Z"
+            fill="#3f3d63" opacity=".8"/>
+    </svg>
+  </div>
+
+  <div class="layer mist" data-depth="26"></div>
+
+  <div class="layer mountains near" data-depth="34">
+    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+      <path d="M0 790 L200 730 L420 790 L640 720 L860 800 L1080 730 L1300 800 L1600 740 L1600 900 L0 900 Z"
+            fill="#25243f"/>
+    </svg>
+  </div>
+
+  <!-- 掉落的花瓣 -->
+  <canvas id="petals" class="layer petals" data-depth="0"></canvas>
+</div>
+
+<!-- ============ 整页玻璃罩 ============ -->
+<div class="veil" aria-hidden="true"></div>
+
+<!-- 鼠标柔光 -->
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<!-- 滚动进度 -->
+<div class="progress"><i id="progressBar"></i></div>
+
+<!-- ============ 导航：一朵花展开 ============ -->
+<nav class="dock" id="dock">
+  <button class="dock-flower" id="dockFlower" aria-label="展开导航" aria-expanded="false">
+    <svg class="bell" viewBox="0 0 40 40" aria-hidden="true">
+      <defs>
+        <linearGradient id="bg1" x1="0" y1="0" x2="0.3" y2="1">
+          <stop offset="0%" stop-color="#f2ecff"/>
+          <stop offset="55%" stop-color="#b9a3e3"/>
+          <stop offset="100%" stop-color="#7d68c4"/>
+        </linearGradient>
+      </defs>
+      <path d="M 20.00 4.60 L 23.76 14.82 L 34.65 15.24 L 26.09 21.98 L 29.05 32.46 L 20.00 26.40 L 10.95 32.46 L 13.91 21.98 L 5.35 15.24 L 16.24 14.82 Z"
+            fill="url(#bg1)" stroke="rgba(255,255,255,.72)" stroke-width="1.1" stroke-linejoin="round"/>
+      <circle cx="20" cy="20" r="3.1" fill="#fffdf7" opacity=".95"/>
+      <circle cx="20" cy="20" r="1.35" fill="#c9b6f2" opacity=".9"/>
+    </svg>
+    <i class="halo"></i>
+  </button>
+
+  <ul class="dock-items" id="dockItems">
+    <li><a href="#about" data-nav>关于</a></li>
+    <li><a href="#works" data-nav>作品</a></li>
+    <li><a href="#contact" data-nav>联系</a></li>
+  </ul>
+</nav>
+
+<!-- ============ 首屏 ============ -->
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <p class="eyebrow">SILVER MOON · 月见</p>
+    <h1 class="title" id="title" aria-label="月见">
+      <span>月</span><span>见</span>
+    </h1>
+    <p class="subtitle">写故事的人 · 在做一款视觉小说</p>
+    <div class="hero-actions">
+      <a class="btn primary" href="#works">看看作品<em class="ripple"></em></a>
+      <a class="btn" href="#about">关于我<em class="ripple"></em></a>
+    </div>
+    <p class="hint">↓ 往下滚一点</p>
+  </div>
+</header>
+
+<!-- ============ 内容 ============ -->
+<main>
+
+  <section id="about" class="section">
+    <h2><span class="bell-icon">✿</span>关于</h2>
+    <div class="glass">
+      <p class="lead">？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？</p>
+      <ul class="facts">
+        <li><b>在做</b><span>？？？？？？</span></li>
+        <li><b>在学</b><span>？？？？？？</span></li>
+        <li><b>在玩</b><span>？？？？？？</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="works" class="section">
+    <h2><span class="bell-icon">✿</span>作品</h2>
+    <div class="cards">
+      <article class="card tilt">
+        <div class="card-glow"></div>
+        <h3>《月见》视觉小说</h3>
+        <p>和风界面、花朵动效、心电线下划线。以 Ren'Py 制作，目前在搭框架阶段。</p>
+        <p class="tag">进行中</p>
+      </article>
+      <article class="card tilt">
+        <div class="card-glow"></div>
+        <h3>角色音色模型</h3>
+        <p>基于 RVC 的音色转换：一段文字进去，出来是那个声音。正在排查推理链路。</p>
+        <p class="tag">实验</p>
+      </article>
+      <article class="card tilt">
+        <div class="card-glow"></div>
+        <h3>本地工具集</h3>
+        <p>文献管理、插件调试、自动化脚本——给自己造的几个小工具。</p>
+        <p class="tag">常用</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <h2><span class="bell-icon">✿</span>联系</h2>
+    <div class="glass">
+      <p class="lead">想聊游戏、聊声音，或者只是路过打个招呼。</p>
+      <ul class="links">
+        <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub<em class="ripple"></em></a></li>
+        <li><a href="https://www.bilibili.com/" target="_blank" rel="noopener">B 站<em class="ripple"></em></a></li>
+        <li><a href="mailto:you@example.com">邮箱<em class="ripple"></em></a></li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>© <span id="year"></span> 月见 · 本站由 GitHub Pages 托管</p>
+</footer>
+
+<script src="assets/main.js?v=5"></script>
+</body>
+</html>
