@@ -2,175 +2,252 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>月见 · 个人主页</title>
-<meta name="description" content="个人主页：视觉小说、语音模型，以及一些在路上的东西。">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='24'>🌙</text></svg>">
-<link rel="stylesheet" href="assets/style.css?v=6">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0a12">
+<title>月见 · SILVER MOON</title>
+<meta name="description" content="写故事的人。在做一款视觉小说，与一些还在路上的东西。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='25' font-size='24'>🌙</text></svg>">
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-<!-- ============ 背景：二次元风景（分景深） ============ -->
-<div class="scene" id="scene" aria-hidden="true">
-  <div class="layer sky"></div>
-  <div class="layer sun"></div>
-  <div class="layer clouds" data-depth="4">
-    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
-        <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"  stop-color="#2b2f6e"/>
-          <stop offset="38%" stop-color="#7b6fb5"/>
-          <stop offset="62%" stop-color="#f3a6a0"/>
-          <stop offset="82%" stop-color="#ffd6ad"/>
-        </linearGradient>
-      </defs>
-      <rect width="1600" height="900" fill="url(#sunset)"/>
-      <g filter="url(#soft)" opacity=".55" fill="#ffffff">
-        <ellipse cx="320" cy="250" rx="210" ry="52"/>
-        <ellipse cx="520" cy="300" rx="160" ry="38"/>
-        <ellipse cx="1180" cy="200" rx="240" ry="56"/>
-        <ellipse cx="1420" cy="300" rx="170" ry="40"/>
-        <ellipse cx="800" cy="150" rx="200" ry="42"/>
-      </g>
-    </svg>
-  </div>
-
-  <div class="layer mountains far" data-depth="10">
-    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-      <path d="M0 620 L180 520 L320 590 L470 470 L640 600 L780 520 L960 610 L1120 500 L1300 600 L1460 530 L1600 610 L1600 900 L0 900 Z"
-            fill="#5a5680" opacity=".55"/>
-    </svg>
-  </div>
-
-  <div class="layer mountains mid" data-depth="18">
-    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-      <path d="M0 700 L150 620 L300 690 L460 590 L620 700 L800 610 L980 710 L1160 620 L1340 700 L1500 630 L1600 700 L1600 900 L0 900 Z"
-            fill="#3f3d63" opacity=".8"/>
-    </svg>
-  </div>
-
-  <div class="layer mist" data-depth="26"></div>
-
-  <div class="layer mountains near" data-depth="34">
-    <svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
-      <path d="M0 790 L200 730 L420 790 L640 720 L860 800 L1080 730 L1300 800 L1600 740 L1600 900 L0 900 Z"
-            fill="#25243f"/>
-    </svg>
-  </div>
-
-  <!-- 掉落的花瓣 -->
-  <canvas id="petals" class="layer petals" data-depth="0"></canvas>
+<!-- 背景：极光 + 噪点 -->
+<div class="bg" aria-hidden="true">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="grid-lines"></div>
+  <canvas id="petals"></canvas>
+  <div class="grain"></div>
 </div>
 
-<!-- ============ 整页玻璃罩 ============ -->
-<div class="veil" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="progress"><i id="bar"></i></div>
 
-<!-- 鼠标柔光 -->
-<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
-
-<!-- 滚动进度 -->
-<div class="progress"><i id="progressBar"></i></div>
-
-<!-- ============ 导航：一朵花展开 ============ -->
-<nav class="dock" id="dock">
-  <button class="dock-flower" id="dockFlower" aria-label="展开导航" aria-expanded="false">
-    <svg class="bell" viewBox="0 0 40 40" aria-hidden="true">
-      <defs>
-        <linearGradient id="bg1" x1="0" y1="0" x2="0.3" y2="1">
-          <stop offset="0%" stop-color="#f2ecff"/>
-          <stop offset="55%" stop-color="#b9a3e3"/>
-          <stop offset="100%" stop-color="#7d68c4"/>
-        </linearGradient>
-      </defs>
+<!-- 导航 -->
+<nav class="nav" id="nav">
+  <a class="brand" href="#top" aria-label="回到顶部">
+    <svg viewBox="0 0 40 40" class="bell" aria-hidden="true">
+      <defs><linearGradient id="g1" x1="0" y1="0" x2=".4" y2="1">
+        <stop offset="0" stop-color="#f4ecff"/><stop offset=".55" stop-color="#b9a3e3"/><stop offset="1" stop-color="#7d68c4"/>
+      </linearGradient></defs>
       <path d="M 20.00 4.60 L 23.76 14.82 L 34.65 15.24 L 26.09 21.98 L 29.05 32.46 L 20.00 26.40 L 10.95 32.46 L 13.91 21.98 L 5.35 15.24 L 16.24 14.82 Z"
-            fill="url(#bg1)" stroke="rgba(255,255,255,.72)" stroke-width="1.1" stroke-linejoin="round"/>
-      <circle cx="20" cy="20" r="3.1" fill="#fffdf7" opacity=".95"/>
-      <circle cx="20" cy="20" r="1.35" fill="#c9b6f2" opacity=".9"/>
+            fill="url(#g1)" stroke="rgba(255,255,255,.55)" stroke-width="1"/>
+      <circle cx="20" cy="20" r="3" fill="#fffdf7" opacity=".92"/>
     </svg>
-    <i class="halo"></i>
-  </button>
-
-  <ul class="dock-items" id="dockItems">
+    <span>月见</span>
+  </a>
+  <ul class="nav-links">
     <li><a href="#about" data-nav>关于</a></li>
     <li><a href="#works" data-nav>作品</a></li>
     <li><a href="#contact" data-nav>联系</a></li>
   </ul>
+  <div class="nav-tools">
+    <button class="icon-btn" id="themeBtn" aria-label="切换日夜" title="切换日夜">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <g stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>
+        </g>
+      </svg>
+    </button>
+    <button class="icon-btn" id="soundBtn" aria-label="音效" title="音效" aria-pressed="false">
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path d="M4 9.5h3.2L12 5.6v12.8L7.2 14.5H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path id="soundWave" d="M15.4 9a4.2 4.2 0 0 1 0 6M17.8 6.6a7.4 7.4 0 0 1 0 10.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+      </svg>
+    </button>
+    <span class="nav-clock" id="clock">--:--</span>
+  </div>
 </nav>
 
-<!-- ============ 首屏 ============ -->
-<header class="hero" id="top">
-  <div class="hero-inner">
-    <p class="eyebrow">SILVER MOON · 月见</p>
-    <h1 class="title" id="title" aria-label="月见">
-      <span>月</span><span>见</span>
+<main id="top">
+
+  <!-- HERO -->
+  <header class="hero">
+    <p class="kicker reveal">SILVER MOON — FOLIO ’26</p>
+
+    <h1 class="display" aria-label="月见">
+      <span class="ch" data-ch="月">月</span><span class="ch" data-ch="见">见</span>
     </h1>
-    <p class="subtitle">写故事的人 · 在做一款视觉小说</p>
-    <div class="hero-actions">
-      <a class="btn primary" href="#works">看看作品<em class="ripple"></em></a>
-      <a class="btn" href="#about">关于我<em class="ripple"></em></a>
+
+    <p class="lede reveal" data-edit="heroLede">写故事的人 · 在做一款视觉小说</p>
+
+    <div class="cta-row reveal">
+      <a class="btn solid magnetic" href="#works"><span>看看作品</span></a>
+      <a class="btn ghost magnetic" href="#about"><span>？？？</span></a>
     </div>
-    <p class="hint">↓ 往下滚一点</p>
+
+    <div class="hero-foot">
+      <span class="scroll-hint">SCROLL ↓</span>
+      <span class="mono">2026 · 11</span>
+    </div>
+  </header>
+
+  <!-- 跑马灯 -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>VISUAL NOVEL</span><i>✿</i><span>银月</span><i>✿</i><span>RENPY</span><i>✿</i>
+      <span>VOICE CLONE</span><i>✿</i><span>月见</span><i>✿</i><span>TAP TAP</span><i>✿</i>
+      <span>VISUAL NOVEL</span><i>✿</i><span>银月</span><i>✿</i><span>RENPY</span><i>✿</i>
+      <span>VOICE CLONE</span><i>✿</i><span>月见</span><i>✿</i><span>TAP TAP</span><i>✿</i>
+    </div>
   </div>
-</header>
 
-<!-- ============ 内容 ============ -->
-<main>
-
+  <!-- 关于：Bento -->
   <section id="about" class="section">
-    <h2><span class="bell-icon">✿</span>关于</h2>
-    <div class="glass">
-      <p class="lead">？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？</p>
-      <ul class="facts">
-        <li><b>在做</b><span>？？？？？？</span></li>
-        <li><b>在学</b><span>？？？？？？</span></li>
-        <li><b>在玩</b><span>？？？？？？</span></li>
-      </ul>
+    <div class="sec-head">
+      <span class="label mono">01 — ABOUT</span>
+      <h2>关于</h2>
+    </div>
+
+    <div class="bento">
+      <article class="cell wide reveal">
+        <span class="cell-tag mono">现在</span>
+        <p class="big" data-edit="aboutBig">？？？？？？？？？？？？？？？？</p>
+        <svg class="watermark" viewBox="0 0 200 200" aria-hidden="true">
+          <path d="M 100 14 L 118 66 L 174 68 L 130 102 L 145 157 L 100 126 L 55 157 L 70 102 L 26 68 L 82 66 Z"
+                fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M 100 34 L 112 70 L 151 71 L 121 94 L 131 131 L 100 110 L 69 131 L 79 94 L 49 71 L 88 70 Z"
+                fill="currentColor" opacity=".22"/>
+          <circle cx="100" cy="100" r="9" fill="currentColor" opacity=".5"/>
+        </svg>
+      </article>
+
+      <article class="cell reveal">
+        <span class="cell-tag mono">在做</span>
+        <h3 data-edit="doingTitle">？？？？？？</h3>
+        <p class="dim" data-edit="doingDesc">在做一个想认真做完的东西。</p>
+      </article>
+
+      <article class="cell reveal">
+        <span class="cell-tag mono">在学</span>
+        <h3 data-edit="learnTitle">？？？？？？</h3>
+        <p class="dim" data-edit="learnDesc">每天挤出几小时，慢慢往前挪。</p>
+      </article>
+
+      <article class="cell reveal">
+        <span class="cell-tag mono">在玩</span>
+        <h3 data-edit="playTitle">？？？？？？</h3>
+        <p class="dim" data-edit="playDesc">声音、代码，还有一点点执念。</p>
+      </article>
+
+      <article class="cell accent reveal">
+        <span class="cell-tag mono">信号</span>
+        <p class="mono small">STATUS / BUILDING<br>ETA / UNKNOWN<br>MOOD / 稳定</p>
+      </article>
     </div>
   </section>
 
+  <!-- 作品 -->
   <section id="works" class="section">
-    <h2><span class="bell-icon">✿</span>作品</h2>
-    <div class="cards">
-      <article class="card tilt">
-        <div class="card-glow"></div>
-        <h3>《月见》视觉小说</h3>
-        <p>和风界面、花朵动效、心电线下划线。以 Ren'Py 制作，目前在搭框架阶段。</p>
-        <p class="tag">进行中</p>
-      </article>
-      <article class="card tilt">
-        <div class="card-glow"></div>
-        <h3>角色音色模型</h3>
-        <p>基于 RVC 的音色转换：一段文字进去，出来是那个声音。正在排查推理链路。</p>
-        <p class="tag">实验</p>
-      </article>
-      <article class="card tilt">
-        <div class="card-glow"></div>
-        <h3>本地工具集</h3>
-        <p>文献管理、插件调试、自动化脚本——给自己造的几个小工具。</p>
-        <p class="tag">常用</p>
-      </article>
+    <div class="sec-head">
+      <span class="label mono">02 — WORKS</span>
+      <h2>作品</h2>
     </div>
+
+    <ol class="work-list">
+      <li class="work reveal">
+        <a href="#">
+          <span class="idx mono">01</span>
+          <div class="w-body">
+            <h3 data-edit="work1Title">《月见》视觉小说</h3>
+            <p data-edit="work1Desc">和风界面、花朵动效、心电线下划线。Ren’Py 制作，目前搭框架。</p>
+          </div>
+          <span class="w-meta mono" data-edit="work1Meta">进行中</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li class="work reveal">
+        <a href="#">
+          <span class="idx mono">02</span>
+          <div class="w-body">
+            <h3 data-edit="work2Title">角色音色模型</h3>
+            <p data-edit="work2Desc">基于 RVC 的音色转换：一段文字进去，出来是那个声音。</p>
+          </div>
+          <span class="w-meta mono" data-edit="work2Meta">实验</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      <li class="work reveal">
+        <a href="#">
+          <span class="idx mono">03</span>
+          <div class="w-body">
+            <h3 data-edit="work3Title">本地工具集</h3>
+            <p data-edit="work3Desc">文献管理、插件调试、自动化脚本——给自己造的小工具。</p>
+          </div>
+          <span class="w-meta mono" data-edit="work3Meta">常用</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    </ol>
   </section>
 
-  <section id="contact" class="section">
-    <h2><span class="bell-icon">✿</span>联系</h2>
-    <div class="glass">
-      <p class="lead">想聊游戏、聊声音，或者只是路过打个招呼。</p>
-      <ul class="links">
-        <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub<em class="ripple"></em></a></li>
-        <li><a href="https://www.bilibili.com/" target="_blank" rel="noopener">B 站<em class="ripple"></em></a></li>
-        <li><a href="mailto:you@example.com">邮箱<em class="ripple"></em></a></li>
-      </ul>
+  <!-- 联系 -->
+  <section id="contact" class="section contact">
+    <div class="sec-head">
+      <span class="label mono">03 — CONTACT</span>
+      <h2>联系</h2>
     </div>
+    <p class="contact-line reveal" data-edit="contactLine">想聊游戏、聊声音，或者只是路过打个招呼。</p>
+    <ul class="contact-links reveal">
+      <li><a href="https://github.com/Omols" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li><a href="https://www.bilibili.com/" target="_blank" rel="noopener">B 站 ↗</a></li>
+      <li><a href="mailto:you@example.com">邮箱 ↗</a></li>
+    </ul>
   </section>
 
 </main>
 
 <footer>
-  <p>© <span id="year"></span> 月见 · 本站由 GitHub Pages 托管</p>
+  <span class="mono">© <span id="year"></span> 月见 · Built on GitHub Pages</span>
+  <span class="mono dim">DESIGNED IN DARK</span>
 </footer>
 
-<script src="assets/main.js?v=6"></script>
+
+<!-- ============ 隐藏入口：管理员登录 ============ -->
+<div class="modal" id="loginModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal-card">
+    <button class="modal-x" id="loginClose" aria-label="关闭">×</button>
+    <p class="mono label">RESTRICTED AREA</p>
+    <h3 id="loginTitle">管理员登录</h3>
+    <form id="loginForm" autocomplete="off">
+      <label class="field">
+        <span class="mono">账户</span>
+        <input id="loginUser" type="text" autocomplete="username" spellcheck="false">
+      </label>
+      <label class="field">
+        <span class="mono">密码</span>
+        <input id="loginPass" type="password" autocomplete="current-password">
+      </label>
+      <p class="err" id="loginErr">账户或密码不对</p>
+      <button class="btn solid" type="submit"><span>进入工作台</span></button>
+    </form>
+    <p class="modal-note mono">LOCAL DRAFT ONLY · 仅本机预览</p>
+  </div>
+</div>
+
+<!-- ============ 工作台 ============ -->
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="网页编辑工作台">
+  <header class="drawer-head">
+    <div>
+      <p class="mono label">WORKBENCH</p>
+      <h3>网页编辑工作台</h3>
+    </div>
+    <button class="modal-x" id="drawerClose" aria-label="关闭">×</button>
+  </header>
+
+  <div class="drawer-body" id="fields"></div>
+
+  <footer class="drawer-foot">
+    <button class="mini solid" id="btnSave">保存到本机</button>
+    <button class="mini" id="btnExport">导出 JSON</button>
+    <button class="mini" id="btnReset">还原初稿</button>
+    <button class="mini ghost" id="btnLogout">退出</button>
+    <p class="drawer-tip mono" id="drawerTip">改动只存在这台电脑的浏览器里，不写服务器。</p>
+  </footer>
+</aside>
+
+<script src="assets/main.js"></script>
 </body>
 </html>

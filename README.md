@@ -1,56 +1,56 @@
 # 月见 · 个人主页
 
-纯静态站点（无需构建），可直接部署到 GitHub Pages。
-
-## 本地预览
-
-双击 `index.html`，或在终端：
-
-```bash
-cd site
-python3 -m http.server 8000
-# 浏览器打开 http://localhost:8000
-```
+纯静态站点（无需构建），部署在 GitHub Pages：**https://omols.github.io**
 
 ## 结构
 
 ```
 site/
-├── index.html        页面结构
+├── index.html          页面结构
 ├── assets/
-│   ├── style.css     样式（米白金 · 和风）
-│   └── main.js       交互（渐显 / 打字 / 毛玻璃微动）
+│   ├── style.css       样式（暗夜极光 / 日间米白 双主题）
+│   └── main.js         交互（主题、音效、花瓣、工作台）
+├── .preview/           自查截图（不提交）
 └── README.md
 ```
 
-## 部署到 GitHub Pages
+## 功能
 
-### 方式 A：网页操作（最简单）
+- **日夜双主题**：右上角太阳/月亮按钮，选择记在本地
+- **音效**：右上角喇叭按钮，WebAudio 实时合成，无音频文件，默认关闭
+- **桔梗花瓣**：canvas 绘制，鼠标拂过会躲开
+- **滚动叙事**：进度线、导航收窄、元素渐显、标题视差
+- **Bento 布局**：关于区的格子
+- **作品列表**：编号行，悬停滑出动效
 
-1. 在 GitHub 新建仓库，名字用 `<你的用户名>.github.io`
-2. 把这个目录里的文件全部上传（Add file → Upload files）
-3. 仓库 Settings → Pages → Source 选 `Deploy from a branch` → `main` / `/ (root)` → Save
-4. 等 1–2 分钟，访问 `https://<你的用户名>.github.io`
+## 隐藏入口：网页编辑工作台
 
-### 方式 B：命令行
+三条路，任选其一：
+
+| 方式 | 操作 |
+|---|---|
+| 地址栏 | `https://omols.github.io/#admin` |
+| 摸 logo | **连点三下** |
+| 快捷键 | `Ctrl / Cmd + Shift + E` |
+
+登录后打开右侧抽屉，可编辑首屏、关于、作品、联系的文字。
+
+**默认账号：** 见 `/private` 备忘（不写在仓库里）
+**注意：** 静态站无后端，登录只是「隐藏」，不是安全认证；改动仅存于本机浏览器（localStorage），不会写到线上。
+
+## 本地预览
 
 ```bash
 cd site
-git init
-git add .
-git commit -m "init: 个人主页"
-git branch -M main
-git remote add origin https://github.com/<用户名>/<用户名>.github.io.git
-git push -u origin main
+python3 -m http.server 8765
+# http://localhost:8765
 ```
 
-### 绑定自定义域名（可选）
+## 更新
 
-1. 在仓库 Settings → Pages → Custom domain 填你的域名
-2. 域名服务商处加 CNAME 记录指向 `<用户名>.github.io`
-3. 等证书签发
-
-## 要改的地方
-
-- `index.html` 里：标题、副标题、关于、作品卡片、联系链接
-- 想换配色：`assets/style.css` 顶部 `:root` 里的变量
+```bash
+git add .
+git commit -m "改了什么"
+git push
+# GitHub Pages 约 1 分钟自动部署
+```
